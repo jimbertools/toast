@@ -6,10 +6,10 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
-	"text/template"
-	"github.com/nu7hatch/gouuid"
 	"syscall"
+	"text/template"
+
+	uuid "github.com/nu7hatch/gouuid"
 )
 
 var toastTemplate *template.Template
@@ -50,11 +50,11 @@ const (
 	Silent         ToastAudio = "silent"
 )
 
-type toastDuration string
+type ToastDuration string
 
 const (
-	Short toastDuration = "short"
-	Long  toastDuration = "long"
+	Short ToastDuration = "short"
+	Long  ToastDuration = "long"
 )
 
 func init() {
@@ -172,7 +172,7 @@ type Notification struct {
 	Loop bool
 
 	// How long the toast should show up for (short/long)
-	Duration toastDuration
+	Duration ToastDuration
 }
 
 // Action
@@ -232,49 +232,44 @@ func (n *Notification) buildXML() (string, error) {
 //	    log.Fatalln(err)
 //	}
 func (n *Notification) Push() error {
-	n.applyDefaults()
-	xml, err := n.buildXML()
+	xml, err := n.script()
 	if err != nil {
 		return err
 	}
-	return invokeTemporaryScript(xml)
-}
 
-// Returns a toastDuration given a user-provided input (useful for cli apps).
-//
-// The default duration is short. If the "name" doesn't match, then the default toastDuration is returned,
-// along with ErrorInvalidDuration. Most of the time "short" is the most appropriate for a toast notification,
-// and Microsoft recommend not using "long", but it can be useful for important dialogs or looping sound toasts.
-//
-// The following names are valid;
-//   - short
-//   - long
-//
-// Handle the error appropriately according to how your app should work.
-func Duration(name string) (toastDuration, error) {
-	switch strings.ToLower(name) {
-	case "short":
-		return Short, nil
-	case "long":
-		return Long, nil
-	default:
-		return Short, ErrorInvalidDuration
+	id, err := uuid.NewV4()
+	if err != nil {
+		return err
 	}
+
+	filePath := filepath.Join(os.TempDir(), id.String()+".ps1")
+	defer os.Remove(filePath)
+	
+	err = writeScript(filePath, xml)
+	if err != nil {
+		return err
+	}
+
+	return invokeScript(filePath)
 }
 
-func invokeTemporaryScript(content string) error {
-	id, _ := uuid.NewV4()
-	file := filepath.Join(os.TempDir(), id.String()+".ps1")
-	defer os.Remove(file)
+func (notification *Notification) script() (xml string, err error) {
+	notification.applyDefaults()
+
+	return notification.buildXML()
+}
+
+func writeScript(filePath, xml string) error { 
 	bomUtf8 := []byte{0xEF, 0xBB, 0xBF}
-	out := append(bomUtf8, []byte(content)...)
-	err := os.WriteFile(file, out, 0600)
-	if err != nil {
-		return err
-	}
-	cmd := exec.Command("PowerShell", "-ExecutionPolicy", "Bypass", "-File", file)
+	out := append(bomUtf8, []byte(xml)...)
+	err := os.WriteFile(filePath, out, 0600)
+	return err
+}
+
+func invokeScript(filePath string) error {
+	cmd := exec.Command("PowerShell", "-ExecutionPolicy", "Bypass", "-File", filePath)
 	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-	if err = cmd.Run(); err != nil {
+	if err := cmd.Run(); err != nil {
 		return err
 	}
 	return nil

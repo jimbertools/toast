@@ -18,9 +18,13 @@ func main() {
 	app.Version = "v1"
 	app.Compiled = time.Now()
 	app.Authors = []cli.Author{
-		cli.Author{
+		{
 			Name:  "Jacob Marshall",
 			Email: "go-toast@jacobmarshall.co",
+		},
+		{
+			Name:  "Wannes Vantorre",
+			Email: "vantorrewannes@gmail.com",
 		},
 	}
 
@@ -86,7 +90,7 @@ func main() {
 		activationType := c.String("activation-type")
 		activationArg := c.String("activation-arg")
 		audio, _ := Audio(c.String("audio"))
-		duration, _ := toast.Duration(c.String("duration"))
+		duration, _ := Duration(c.String("duration"))
 		loop := c.Bool("loop")
 
 		var actions []toast.Action
@@ -132,8 +136,6 @@ func main() {
 
 	app.Run(os.Args)
 }
-
-
 
 // Returns a toastAudio given a user-provided input (useful for cli apps).
 //
@@ -208,5 +210,27 @@ func Audio(name string) (toast.ToastAudio, error) {
 		return toast.Silent, nil
 	default:
 		return toast.Default, toast.ErrorInvalidAudio
+	}
+}
+
+// Returns a toastDuration given a user-provided input (useful for cli apps).
+//
+// The default duration is short. If the "name" doesn't match, then the default toastDuration is returned,
+// along with ErrorInvalidDuration. Most of the time "short" is the most appropriate for a toast notification,
+// and Microsoft recommend not using "long", but it can be useful for important dialogs or looping sound toasts.
+//
+// The following names are valid;
+//   - short
+//   - long
+//
+// Handle the error appropriately according to how your app should work.
+func Duration(name string) (toast.ToastDuration, error) {
+	switch strings.ToLower(name) {
+	case "short":
+		return toast.Short, nil
+	case "long":
+		return toast.Long, nil
+	default:
+		return toast.Short, toast.ErrorInvalidDuration
 	}
 }
