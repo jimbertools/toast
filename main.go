@@ -3,9 +3,10 @@ package main
 import (
 	"log"
 	"os"
+	"strings"
 	"time"
 
-	"gopkg.in/toast.v1"
+	"github.com/jimbertools/toast/pkg/toast"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -84,7 +85,7 @@ func main() {
 		icon := c.String("icon")
 		activationType := c.String("activation-type")
 		activationArg := c.String("activation-arg")
-		audio, _ := toast.Audio(c.String("audio"))
+		audio, _ := Audio(c.String("audio"))
 		duration, _ := toast.Duration(c.String("duration"))
 		loop := c.Bool("loop")
 
@@ -130,4 +131,82 @@ func main() {
 	}
 
 	app.Run(os.Args)
+}
+
+
+
+// Returns a toastAudio given a user-provided input (useful for cli apps).
+//
+// If the "name" doesn't match, then the default toastAudio is returned, along with ErrorInvalidAudio.
+//
+// The following names are valid;
+//   - default
+//   - im
+//   - mail
+//   - reminder
+//   - sms
+//   - loopingalarm
+//   - loopimgalarm[2-10]
+//   - loopingcall
+//   - loopingcall[2-10]
+//   - silent
+//
+// Handle the error appropriately according to how your app should work.
+func Audio(name string) (toast.ToastAudio, error) {
+	switch strings.ToLower(name) {
+	case "default":
+		return toast.Default, nil
+	case "im":
+		return toast.IM, nil
+	case "mail":
+		return toast.Mail, nil
+	case "reminder":
+		return toast.Reminder, nil
+	case "sms":
+		return toast.SMS, nil
+	case "loopingalarm":
+		return toast.LoopingAlarm, nil
+	case "loopingalarm2":
+		return toast.LoopingAlarm2, nil
+	case "loopingalarm3":
+		return toast.LoopingAlarm3, nil
+	case "loopingalarm4":
+		return toast.LoopingAlarm4, nil
+	case "loopingalarm5":
+		return toast.LoopingAlarm5, nil
+	case "loopingalarm6":
+		return toast.LoopingAlarm6, nil
+	case "loopingalarm7":
+		return toast.LoopingAlarm7, nil
+	case "loopingalarm8":
+		return toast.LoopingAlarm8, nil
+	case "loopingalarm9":
+		return toast.LoopingAlarm9, nil
+	case "loopingalarm10":
+		return toast.LoopingAlarm10, nil
+	case "loopingcall":
+		return toast.LoopingCall, nil
+	case "loopingcall2":
+		return toast.LoopingCall2, nil
+	case "loopingcall3":
+		return toast.LoopingCall3, nil
+	case "loopingcall4":
+		return toast.LoopingCall4, nil
+	case "loopingcall5":
+		return toast.LoopingCall5, nil
+	case "loopingcall6":
+		return toast.LoopingCall6, nil
+	case "loopingcall7":
+		return toast.LoopingCall7, nil
+	case "loopingcall8":
+		return toast.LoopingCall8, nil
+	case "loopingcall9":
+		return toast.LoopingCall9, nil
+	case "loopingcall10":
+		return toast.LoopingCall10, nil
+	case "silent":
+		return toast.Silent, nil
+	default:
+		return toast.Default, toast.ErrorInvalidAudio
+	}
 }

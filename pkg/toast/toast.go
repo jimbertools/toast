@@ -19,35 +19,35 @@ var (
 	ErrorInvalidDuration       = errors.New("toast: invalid duration")
 )
 
-type toastAudio string
+type ToastAudio string
 
 const (
-	Default        toastAudio = "ms-winsoundevent:Notification.Default"
-	IM             toastAudio = "ms-winsoundevent:Notification.IM"
-	Mail           toastAudio = "ms-winsoundevent:Notification.Mail"
-	Reminder       toastAudio = "ms-winsoundevent:Notification.Reminder"
-	SMS            toastAudio = "ms-winsoundevent:Notification.SMS"
-	LoopingAlarm   toastAudio = "ms-winsoundevent:Notification.Looping.Alarm"
-	LoopingAlarm2  toastAudio = "ms-winsoundevent:Notification.Looping.Alarm2"
-	LoopingAlarm3  toastAudio = "ms-winsoundevent:Notification.Looping.Alarm3"
-	LoopingAlarm4  toastAudio = "ms-winsoundevent:Notification.Looping.Alarm4"
-	LoopingAlarm5  toastAudio = "ms-winsoundevent:Notification.Looping.Alarm5"
-	LoopingAlarm6  toastAudio = "ms-winsoundevent:Notification.Looping.Alarm6"
-	LoopingAlarm7  toastAudio = "ms-winsoundevent:Notification.Looping.Alarm7"
-	LoopingAlarm8  toastAudio = "ms-winsoundevent:Notification.Looping.Alarm8"
-	LoopingAlarm9  toastAudio = "ms-winsoundevent:Notification.Looping.Alarm9"
-	LoopingAlarm10 toastAudio = "ms-winsoundevent:Notification.Looping.Alarm10"
-	LoopingCall    toastAudio = "ms-winsoundevent:Notification.Looping.Call"
-	LoopingCall2   toastAudio = "ms-winsoundevent:Notification.Looping.Call2"
-	LoopingCall3   toastAudio = "ms-winsoundevent:Notification.Looping.Call3"
-	LoopingCall4   toastAudio = "ms-winsoundevent:Notification.Looping.Call4"
-	LoopingCall5   toastAudio = "ms-winsoundevent:Notification.Looping.Call5"
-	LoopingCall6   toastAudio = "ms-winsoundevent:Notification.Looping.Call6"
-	LoopingCall7   toastAudio = "ms-winsoundevent:Notification.Looping.Call7"
-	LoopingCall8   toastAudio = "ms-winsoundevent:Notification.Looping.Call8"
-	LoopingCall9   toastAudio = "ms-winsoundevent:Notification.Looping.Call9"
-	LoopingCall10  toastAudio = "ms-winsoundevent:Notification.Looping.Call10"
-	Silent         toastAudio = "silent"
+	Default        ToastAudio = "ms-winsoundevent:Notification.Default"
+	IM             ToastAudio = "ms-winsoundevent:Notification.IM"
+	Mail           ToastAudio = "ms-winsoundevent:Notification.Mail"
+	Reminder       ToastAudio = "ms-winsoundevent:Notification.Reminder"
+	SMS            ToastAudio = "ms-winsoundevent:Notification.SMS"
+	LoopingAlarm   ToastAudio = "ms-winsoundevent:Notification.Looping.Alarm"
+	LoopingAlarm2  ToastAudio = "ms-winsoundevent:Notification.Looping.Alarm2"
+	LoopingAlarm3  ToastAudio = "ms-winsoundevent:Notification.Looping.Alarm3"
+	LoopingAlarm4  ToastAudio = "ms-winsoundevent:Notification.Looping.Alarm4"
+	LoopingAlarm5  ToastAudio = "ms-winsoundevent:Notification.Looping.Alarm5"
+	LoopingAlarm6  ToastAudio = "ms-winsoundevent:Notification.Looping.Alarm6"
+	LoopingAlarm7  ToastAudio = "ms-winsoundevent:Notification.Looping.Alarm7"
+	LoopingAlarm8  ToastAudio = "ms-winsoundevent:Notification.Looping.Alarm8"
+	LoopingAlarm9  ToastAudio = "ms-winsoundevent:Notification.Looping.Alarm9"
+	LoopingAlarm10 ToastAudio = "ms-winsoundevent:Notification.Looping.Alarm10"
+	LoopingCall    ToastAudio = "ms-winsoundevent:Notification.Looping.Call"
+	LoopingCall2   ToastAudio = "ms-winsoundevent:Notification.Looping.Call2"
+	LoopingCall3   ToastAudio = "ms-winsoundevent:Notification.Looping.Call3"
+	LoopingCall4   ToastAudio = "ms-winsoundevent:Notification.Looping.Call4"
+	LoopingCall5   ToastAudio = "ms-winsoundevent:Notification.Looping.Call5"
+	LoopingCall6   ToastAudio = "ms-winsoundevent:Notification.Looping.Call6"
+	LoopingCall7   ToastAudio = "ms-winsoundevent:Notification.Looping.Call7"
+	LoopingCall8   ToastAudio = "ms-winsoundevent:Notification.Looping.Call8"
+	LoopingCall9   ToastAudio = "ms-winsoundevent:Notification.Looping.Call9"
+	LoopingCall10  ToastAudio = "ms-winsoundevent:Notification.Looping.Call10"
+	Silent         ToastAudio = "silent"
 )
 
 type toastDuration string
@@ -166,7 +166,7 @@ type Notification struct {
 	Actions []Action
 
 	// The audio to play when displaying the toast
-	Audio toastAudio
+	Audio ToastAudio
 
 	// Whether to loop the audio (default false)
 	Loop bool
@@ -238,82 +238,6 @@ func (n *Notification) Push() error {
 		return err
 	}
 	return invokeTemporaryScript(xml)
-}
-
-// Returns a toastAudio given a user-provided input (useful for cli apps).
-//
-// If the "name" doesn't match, then the default toastAudio is returned, along with ErrorInvalidAudio.
-//
-// The following names are valid;
-//   - default
-//   - im
-//   - mail
-//   - reminder
-//   - sms
-//   - loopingalarm
-//   - loopimgalarm[2-10]
-//   - loopingcall
-//   - loopingcall[2-10]
-//   - silent
-//
-// Handle the error appropriately according to how your app should work.
-func Audio(name string) (toastAudio, error) {
-	switch strings.ToLower(name) {
-	case "default":
-		return Default, nil
-	case "im":
-		return IM, nil
-	case "mail":
-		return Mail, nil
-	case "reminder":
-		return Reminder, nil
-	case "sms":
-		return SMS, nil
-	case "loopingalarm":
-		return LoopingAlarm, nil
-	case "loopingalarm2":
-		return LoopingAlarm2, nil
-	case "loopingalarm3":
-		return LoopingAlarm3, nil
-	case "loopingalarm4":
-		return LoopingAlarm4, nil
-	case "loopingalarm5":
-		return LoopingAlarm5, nil
-	case "loopingalarm6":
-		return LoopingAlarm6, nil
-	case "loopingalarm7":
-		return LoopingAlarm7, nil
-	case "loopingalarm8":
-		return LoopingAlarm8, nil
-	case "loopingalarm9":
-		return LoopingAlarm9, nil
-	case "loopingalarm10":
-		return LoopingAlarm10, nil
-	case "loopingcall":
-		return LoopingCall, nil
-	case "loopingcall2":
-		return LoopingCall2, nil
-	case "loopingcall3":
-		return LoopingCall3, nil
-	case "loopingcall4":
-		return LoopingCall4, nil
-	case "loopingcall5":
-		return LoopingCall5, nil
-	case "loopingcall6":
-		return LoopingCall6, nil
-	case "loopingcall7":
-		return LoopingCall7, nil
-	case "loopingcall8":
-		return LoopingCall8, nil
-	case "loopingcall9":
-		return LoopingCall9, nil
-	case "loopingcall10":
-		return LoopingCall10, nil
-	case "silent":
-		return Silent, nil
-	default:
-		return Default, ErrorInvalidAudio
-	}
 }
 
 // Returns a toastDuration given a user-provided input (useful for cli apps).
