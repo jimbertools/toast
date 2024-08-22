@@ -3,6 +3,7 @@ package toast
 import (
 	"bytes"
 	"errors"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -116,6 +117,7 @@ func (n *ToastManager) registerToastManager() error {
 		return err
 	}
 
+	log.Println(script.String())
 	return runScript(scriptPath)
 }
 
@@ -235,6 +237,7 @@ func (toast *Toast) Show() error {
 		return err
 	}
 
+	log.Println(script.String())
 	return runScript(scriptPath)
 }
 
