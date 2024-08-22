@@ -84,9 +84,9 @@ func main() {
 
 	app.Action = func(c *cli.Context) error {
 		appID := c.String("app-id")
+		icon := c.String("icon")
 		title := c.String("title")
 		message := c.String("message")
-		icon := c.String("icon")
 		activationType := c.String("activation-type")
 		activationArg := c.String("activation-arg")
 		audio, _ := Audio(c.String("audio"))
@@ -107,27 +107,18 @@ func main() {
 			if len(actionArgs) > index {
 				actionArg = actionArgs[index]
 			}
-			actions = append(actions, toast.Action{
-				Type:      actionType,
-				Label:     actionLabel,
-				Arguments: actionArg,
-			})
+			actions = append(actions, toast.NewAction(actionType, actionLabel, actionArg))
 		}
 
-		notification := &toast.Notification{
-			AppID:               appID,
-			Title:               title,
-			Message:             message,
-			Icon:                icon,
-			Actions:             actions,
-			ActivationType:      activationType,
-			ActivationArguments: activationArg,
-			Audio:               audio,
-			Loop:                loop,
-			Duration:            duration,
+		toastManager, err := toast.NewToastManager(appID, appID, icon)
+
+		if err != nil {
+			log.Fatalln(err)
 		}
 
-		if err := notification.Push(); err != nil {
+		toast := toastManager.NewToast(title, message, activationType, activationArg, actions, audio, loop, duration)
+		err = toast.Show()
+		if err != nil {
 			log.Fatalln(err)
 		}
 
